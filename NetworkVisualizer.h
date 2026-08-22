@@ -14,7 +14,7 @@ private:
     //std::vector<sf::Vector2f> positions;
 
     const float NODE_RADIUS = 20.0f;
-    const float SPACING_X = 210.0f;
+    const float SPACING_X = 250.0f;
     const float SPACING_Y = 120.0f;
 
     

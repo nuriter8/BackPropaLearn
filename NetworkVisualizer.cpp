@@ -1,6 +1,9 @@
 #include "NetworkVisualizer.h"
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
+#include <cmath>
+#include <iomanip>
 using namespace std;
 
 NetworkVisualizer::NetworkVisualizer(BackPropagation &arch)
@@ -148,7 +151,21 @@ void NetworkVisualizer::draw_connections()
         return;
     }
 
-    cout << "inside draw connections" << endl;
+    cout << "drawing connections (not alg)" << endl;
+
+    sf::Font font;
+
+    if (!font.loadFromFile("ARIALLGT.TTF")){
+        cout << "can't load font" << endl;
+        return;
+    }
+
+
+    sf::Text weightText;
+    weightText.setFont(font);
+    weightText.setCharacterSize(8);
+    weightText.setFillColor(sf::Color::White);
+    weightText.setStyle(sf::Text::Bold);
 
     for (size_t i = 1; i < architecture->layers.size(); i++)
     {
@@ -166,8 +183,9 @@ void NetworkVisualizer::draw_connections()
                 if (k < current_layer[j].weights.size())
                 {
                     double weight = current_layer[j].weights[k];
+                    
 
-                    cout << "drawing cons from layer " << i << " node " << j << " w : " << weight << endl;
+                    // cout << "drawing cons from layer " << i << " node " << j << " w : " << weight << endl;
 
                     sf::Color color;
 
@@ -178,6 +196,52 @@ void NetworkVisualizer::draw_connections()
                         sf::Vertex(current_layer[j].position, color)};
 
                     window.draw(line, 2, sf::Lines);
+
+                    sf::Vector2f posA = previous_layer[k].position;
+                    sf::Vector2f posB = current_layer[j].position;
+
+
+
+                    float t = 0.3f;
+
+                    sf::Vector2f textPos;
+                    textPos.x = posA.x + (posB.x - posA.x) * t;
+                    textPos.y = posA.y + (posB.y - posA.y) * t;
+
+
+
+                    //sf::Vector2f midpoint = (posA + posB) / 2.0f;
+
+                    
+                    sf::Vector2f dir = posB - posA;
+
+                    float angle = atan2(dir.y, dir.x);
+
+                    float length = sqrt(dir.x * dir.x + dir.y * dir.y);
+
+                    if (length > 0)
+                    {
+                        sf::Vector2f perp(-dir.y / length, dir.x / length);
+
+                        float offset = 10.0f;
+                        textPos += perp * offset;
+                    }
+
+
+                    std::ostringstream ss;
+                    ss << fixed << setprecision(2) << weight;
+                    weightText.setString(ss.str());
+
+                    //weightText.setString(std::to_string(weight));
+
+                    sf::FloatRect textBounds = weightText.getLocalBounds();
+                    weightText.setOrigin(textBounds.left + textBounds.width / 2.0f,
+                                         textBounds.top + textBounds.height / 2.0f);
+
+                    weightText.setPosition(textPos);
+                    weightText.setRotation(angle * 180.0f / 3.14159265f);
+
+                    window.draw(weightText);
                 }
             }
         }
