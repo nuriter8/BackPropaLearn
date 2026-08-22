@@ -3,7 +3,6 @@
 #include <cmath>
 using namespace std;
 
-
 // sudo apt-get install libsfml-dev
 
 // default values
@@ -13,6 +12,8 @@ Neuron::Neuron(size_t size_prev_layer)
     this->bias = this->delta = this->output = this->sum = 0.0;
 
     this->bias = (((double)rand()) / RAND_MAX) - 0.5;
+
+    this->weights.resize(size_prev_layer);
 
     for (double &weight : this->weights)
     {
@@ -24,6 +25,12 @@ Neuron::Neuron(size_t size_prev_layer)
 
         cout << "initializing weigth as " << weight << endl;
     }
+
+    graphic.setRadius(20.0f);
+    graphic.setFillColor(sf::Color(100, 100, 100));
+    graphic.setOutlineColor(sf::Color::White);
+    graphic.setOutlineThickness(2.0f);
+    position = sf::Vector2f(0, 0);
 }
 
 Layer::Layer(size_t size_actual_layer, size_t size_prev_laver)
@@ -40,6 +47,19 @@ Layer::Layer(size_t size_actual_layer, size_t size_prev_laver)
         cout << "layer " << i << " initialized" << endl;
     }
     cout << endl;
+}
+
+void BackPropagation::clear_neurons()
+{
+    for (auto &layer : layers)
+    {
+        for (auto &neuron : layer.neurons)
+        {
+            neuron.output = 0.0;
+            neuron.delta = 0.0;
+            neuron.sum = 0.0;
+        }
+    }
 }
 
 double BackPropagation::sigmoid(double n)
@@ -70,7 +90,7 @@ double BackPropagation::relu_derivada(double x)
 // the input is input_layer, hidden layers, output layer
 BackPropagation::BackPropagation(const vector<size_t> &architecture)
 {
-    for (int i = 0; i < architecture.size(); i++)
+    for (int i = 1; i < architecture.size(); i++)
     {
         Layer layer(architecture[i], architecture[i - 1]);
         this->layers.push_back(layer);
@@ -137,7 +157,8 @@ void BackPropagation::back(const vector<double> &input, const vector<double> tar
     Layer &output_layer = layers.back();
     // output is last layer of all the layers we've got
 
-    for (size_t i = 0; i < output_layer.neurons.size(); i++){
+    for (size_t i = 0; i < output_layer.neurons.size(); i++)
+    {
 
         double current_neuron_output = output_layer.neurons[i].output;
         output_layer.neurons[i].delta = current_neuron_output - target[i];
@@ -145,22 +166,22 @@ void BackPropagation::back(const vector<double> &input, const vector<double> tar
 
     // go backwards
 
-    for (size_t i = layers.size() - 2; i >= 0; i --){
+    for (size_t i = layers.size() - 2; i >= 0; i--)
+    {
         // each layer
 
-
-        for(size_t j = 0; j < layers[i].neurons.size(); i++){
+        for (size_t j = 0; j < layers[i].neurons.size(); j++)
+        {
             // all the neurons from each layer
 
             double sum = 0.0;
 
-            for(auto &nextlayer_neuron : layers[i+1].neurons){
+            for (auto &nextlayer_neuron : layers[i + 1].neurons)
+            {
 
                 sum += nextlayer_neuron.weights[i] * nextlayer_neuron.delta;
                 // our current neuron set is connected to the next set of neurons
             }
         }
     }
-
-
 }

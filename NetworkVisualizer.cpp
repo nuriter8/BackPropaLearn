@@ -3,7 +3,7 @@
 #include <cstdlib>
 using namespace std;
 
-NetworkVisualizer::NetworkVisualizer(const std::vector<size_t> &architecture)
+NetworkVisualizer::NetworkVisualizer(BackPropagation &arch)
 {
     sf::ContextSettings settings;
 
@@ -21,6 +21,10 @@ NetworkVisualizer::NetworkVisualizer(const std::vector<size_t> &architecture)
         cerr << "couldn't open window" << endl;
         return;
     }
+
+    architecture = &arch;
+
+    setup_network();
 }
 
 void NetworkVisualizer::run()
@@ -48,9 +52,11 @@ void NetworkVisualizer::run()
 
         window.clear(sf::Color(30, 30, 30));
 
+        draw_connections();
+        draw_nodes();
         window.display();
 
-        sf::sleep(sf::milliseconds(16));
+        sf::sleep(sf::milliseconds(50));
     }
 }
 
@@ -58,12 +64,122 @@ NetworkVisualizer::~NetworkVisualizer()
 {
 }
 
-void NetworkVisualizer::setup_network(const std::vector<size_t> &architecture)
+void NetworkVisualizer::setup_network()
 {
     cout << "setting up";
+
+    architecture->clear_neurons();
+
+    if (architecture->layers.empty())
+    {
+        return;
+    }
+
+    float width = WINDOW_WIDTH;
+    float heigh = WINDOW_HEIGHT;
+
+    float total_width = (architecture->layers.size() - 1) * SPACING_X;
+    float start_x_offset = (width - total_width) / 2.0f;
+
+    for (int i = 0; i < architecture->layers.size(); i++)
+    {
+        vector<Neuron> &neurons_in_layer = architecture->layers[i].neurons;
+
+        float center_y = heigh / 2.0f;
+        float y_offset = (neurons_in_layer.size() - 1) * SPACING_Y / 2.0f;
+
+        sf::Color layer_color;
+
+        if (i == 0)
+        {
+            layer_color = sf::Color::Red;
+        }
+        else if (i == architecture->layers.size() - 1)
+        {
+            layer_color = sf::Color::Blue;
+        }
+        else
+        {
+            layer_color = sf::Color::Green;
+        }
+
+        for (size_t j = 0; j < neurons_in_layer.size(); j++)
+        {
+            float x = start_x_offset + i * SPACING_X;
+            float y = center_y - y_offset + j * SPACING_Y;
+
+            architecture->layers[i].neurons[j].graphic.setRadius(NODE_RADIUS);
+
+            neurons_in_layer[j].graphic.setPosition(x - NODE_RADIUS, y - NODE_RADIUS);
+            neurons_in_layer[j].graphic.setFillColor(layer_color);
+            neurons_in_layer[j].graphic.setOutlineColor(sf::Color::White);
+            neurons_in_layer[j].graphic.setOutlineThickness(2.0f);
+
+            neurons_in_layer[j].position = sf::Vector2f(x, y);
+        }
+    }
 }
 
 void NetworkVisualizer::draw_nodes()
 {
-    cout << "drawing nodes";
+
+    for (int i = 0; i < this->architecture->layers.size(); i++)
+    {
+        for (int j = 0; j < this->architecture->layers[i].neurons.size(); j++)
+        {
+            // cout << "drawing node " << j << " from layer " << i << endl;
+
+            window.draw(this->architecture->layers[i].neurons[j].graphic);
+        }
+    }
+}
+
+void NetworkVisualizer::draw_connections()
+{
+    if (!architecture)
+    {
+        cout << "no architecture" << endl;
+        return;
+    }
+
+    if (architecture->layers.size() < 2)
+    {
+        cout << "not enough layers" << endl;
+        return;
+    }
+
+    cout << "inside draw connections" << endl;
+
+    for (size_t i = 1; i < architecture->layers.size(); i++)
+    {
+
+        vector<Neuron> &current_layer = architecture->layers[i].neurons;
+        vector<Neuron> &previous_layer = architecture->layers[i - 1].neurons;
+
+        for (size_t j = 0; j < current_layer.size(); j++)
+        {
+
+            for (size_t k = 0; k < previous_layer.size(); k++)
+            {
+                // cout << "j " << j << " " << current_layer[j].weights.size() << " and k " << previous_layer.size() << endl;
+
+                if (k < current_layer[j].weights.size())
+                {
+                    double weight = current_layer[j].weights[k];
+
+                    cout << "drawing cons from layer " << i << " node " << j << " w : " << weight << endl;
+
+                    sf::Color color;
+
+                    color = sf::Color(100, 100, 100, 100);
+
+                    sf::Vertex line[] = {
+                        sf::Vertex(previous_layer[k].position, color),
+                        sf::Vertex(current_layer[j].position, color)};
+
+                    window.draw(line, 2, sf::Lines);
+                }
+            }
+        }
+    }
 }

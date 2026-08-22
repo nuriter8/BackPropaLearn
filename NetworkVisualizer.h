@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <iostream>
+#include "BP.h"
 
 using namespace std;
 
@@ -9,22 +10,27 @@ class NetworkVisualizer
 {
 private:
     sf::RenderWindow window;
-    std::vector<sf::CircleShape> neurons;
-    std::vector<sf::Vector2f> positions;
+    //std::vector<sf::CircleShape> neurons;
+    //std::vector<sf::Vector2f> positions;
 
     const float NODE_RADIUS = 20.0f;
-    const float SPACING_X = 120.0f;
-    const float SPACING_Y = 70.0f;
+    const float SPACING_X = 210.0f;
+    const float SPACING_Y = 120.0f;
 
     
     const float WINDOW_WIDTH = 1000.0f;
     const float WINDOW_HEIGHT = 600.0f;
 
-    void setup_network(const std::vector<size_t> &architecture);
+
+    BackPropagation *architecture;
+
+
+    void setup_network();
     void draw_nodes();
+    void draw_connections();
 
 public:
-    NetworkVisualizer(const std::vector<size_t> &architecture);
+    NetworkVisualizer(BackPropagation &arch);
     void run();
     ~NetworkVisualizer();
 };

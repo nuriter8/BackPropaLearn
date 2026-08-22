@@ -1,6 +1,7 @@
 #ifndef _BP_NN_
 #define _BP_NN_
 #include <iostream>
+#include <SFML/Graphics.hpp>
 #include <vector>
 using namespace std;
 
@@ -8,7 +9,15 @@ class Neuron
 {
 
 public:
+
+    sf::CircleShape graphic;
+    sf::Vector2f position;
+
     vector<double> weights;
+    // graphic weights: each one is connected to each neuron from the previous layer
+    vector<sf::VertexArray> graphic_weights;
+
+
     double sum;
     double bias;
     double output;
@@ -16,13 +25,16 @@ public:
 
     // its attributes will be init. with default values
     Neuron(size_t size_prev_layer);
+    
 };
 
 class Layer
 {
 public:
     vector<Neuron> neurons;
+    
     Layer(size_t size_actual_layer, size_t size_prev_laver);
+    
 };
 
 class BackPropagation
@@ -42,7 +54,7 @@ public:
     BackPropagation(const vector<size_t> &architecture);
     vector<double> forward(const vector<double> &input, char function);
     void back(const vector<double> &input, const vector<double> output, char function);
-    
+    void clear_neurons();
 };
 
 #endif
