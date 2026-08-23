@@ -9,7 +9,7 @@ int main(){
     // compile with: g++ -o cod BP.cpp NetworkVisualizer.cpp test.cpp -lsfml-graphics -lsfml-window -lsfml-system
 
 
-    BackPropagation BP_Network({1, 2, 7, 5, 5, 2});
+    BackPropagation BP_Network({1, 3, 5, 2});
     
    
     NetworkVisualizer visualizer(BP_Network);

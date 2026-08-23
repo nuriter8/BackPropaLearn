@@ -28,6 +28,55 @@ NetworkVisualizer::NetworkVisualizer(BackPropagation &arch)
     architecture = &arch;
 
     setup_network();
+    setup_panel();
+}
+
+void NetworkVisualizer::setup_panel()
+{
+    float panel_width = WINDOW_WIDTH * PANEL_WIDTH_RATIO;
+
+    infoPanel.setSize(sf::Vector2f(panel_width, WINDOW_HEIGHT));
+    infoPanel.setPosition(0.0f, 0.0f);
+    infoPanel.setFillColor(sf::Color(171, 213, 255));
+
+
+    /*
+    
+    sf::Font font;
+
+    if (!font.loadFromFile("ARIALLGT.TTF"))
+    {
+        cout << "can't load font" << endl;
+        return;
+    }
+
+    sf::Text weightText;
+    weightText.setFont(font);
+    weightText.setCharacterSize(8);
+    weightText.setFillColor(sf::Color::Black);
+    weightText.setStyle(sf::Text::Bold);
+
+
+
+    */
+
+    // sf::Font titleFont;
+    titleFont.loadFromFile("ARIALLGT.TTF");
+
+    // sf::Text title;
+    title.setFont(titleFont);
+    title.setCharacterSize(25);
+    title.setFillColor(sf::Color::Blue);
+    title.setStyle(sf::Text::Bold);
+    title.setString("BackPropaLearn");
+    title.setPosition(90.0f, 40.0f);
+
+
+}
+void NetworkVisualizer::draw_panel()
+{
+    window.draw(infoPanel);
+    window.draw(title);
 }
 
 void NetworkVisualizer::run()
@@ -57,6 +106,9 @@ void NetworkVisualizer::run()
 
         draw_connections();
         draw_nodes();
+
+        draw_panel();
+
         window.display();
 
         sf::sleep(sf::milliseconds(50));
@@ -78,11 +130,13 @@ void NetworkVisualizer::setup_network()
         return;
     }
 
-    float width = WINDOW_WIDTH;
+    float panel_width = WINDOW_WIDTH * PANEL_WIDTH_RATIO;
+    float diagram_x_start = panel_width;
+    float diagram_width = WINDOW_WIDTH - panel_width;
     float heigh = WINDOW_HEIGHT;
 
     float total_width = (architecture->layers.size() - 1) * SPACING_X;
-    float start_x_offset = (width - total_width) / 2.0f;
+    float start_x_offset = diagram_x_start + (diagram_width - total_width) / 2.0f;
 
     for (int i = 0; i < architecture->layers.size(); i++)
     {
@@ -155,17 +209,17 @@ void NetworkVisualizer::draw_connections()
 
     sf::Font font;
 
-    if (!font.loadFromFile("ARIALLGT.TTF")){
+    if (!font.loadFromFile("arial.ttf"))
+    {
         cout << "can't load font" << endl;
         return;
     }
-
 
     sf::Text weightText;
     weightText.setFont(font);
     weightText.setCharacterSize(8);
     weightText.setFillColor(sf::Color::Black);
-    weightText.setStyle(sf::Text::Bold);
+    //weightText.setStyle(sf::Text::Bold);
 
     for (size_t i = 1; i < architecture->layers.size(); i++)
     {
@@ -183,7 +237,6 @@ void NetworkVisualizer::draw_connections()
                 if (k < current_layer[j].weights.size())
                 {
                     double weight = current_layer[j].weights[k];
-                    
 
                     // cout << "drawing cons from layer " << i << " node " << j << " w : " << weight << endl;
 
@@ -200,19 +253,14 @@ void NetworkVisualizer::draw_connections()
                     sf::Vector2f posA = previous_layer[k].position;
                     sf::Vector2f posB = current_layer[j].position;
 
-
-
                     float t = 0.2f;
 
                     sf::Vector2f textPos;
                     textPos.x = posA.x + (posB.x - posA.x) * t;
                     textPos.y = posA.y + (posB.y - posA.y) * t;
 
+                    // sf::Vector2f midpoint = (posA + posB) / 2.0f;
 
-
-                    //sf::Vector2f midpoint = (posA + posB) / 2.0f;
-
-                    
                     sf::Vector2f dir = posB - posA;
 
                     float angle = atan2(dir.y, dir.x);
@@ -227,12 +275,11 @@ void NetworkVisualizer::draw_connections()
                         textPos += perp * offset;
                     }
 
-
                     std::ostringstream ss;
                     ss << fixed << setprecision(2) << weight;
                     weightText.setString(ss.str());
 
-                    //weightText.setString(std::to_string(weight));
+                    // weightText.setString(std::to_string(weight));
 
                     sf::FloatRect textBounds = weightText.getLocalBounds();
                     weightText.setOrigin(textBounds.left + textBounds.width / 2.0f,
