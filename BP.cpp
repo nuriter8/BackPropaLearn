@@ -90,7 +90,7 @@ double BackPropagation::relu_derivada(double x)
 // the input is input_layer, hidden layers, output layer
 BackPropagation::BackPropagation(const vector<size_t> &architecture)
 {
-    for (int i = 1; i < architecture.size(); i++)
+    for (int i = 0; i < architecture.size(); i++)
     {
         Layer layer(architecture[i], architecture[i - 1]);
         this->layers.push_back(layer);

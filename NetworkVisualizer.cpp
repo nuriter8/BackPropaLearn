@@ -53,7 +53,7 @@ void NetworkVisualizer::run()
             }
         }
 
-        window.clear(sf::Color(30, 30, 30));
+        window.clear(sf::Color::White);
 
         draw_connections();
         draw_nodes();
@@ -115,8 +115,8 @@ void NetworkVisualizer::setup_network()
 
             neurons_in_layer[j].graphic.setPosition(x - NODE_RADIUS, y - NODE_RADIUS);
             neurons_in_layer[j].graphic.setFillColor(layer_color);
-            neurons_in_layer[j].graphic.setOutlineColor(sf::Color::White);
-            neurons_in_layer[j].graphic.setOutlineThickness(2.0f);
+            neurons_in_layer[j].graphic.setOutlineColor(sf::Color::Black);
+            neurons_in_layer[j].graphic.setOutlineThickness(1.0f);
 
             neurons_in_layer[j].position = sf::Vector2f(x, y);
         }
@@ -164,7 +164,7 @@ void NetworkVisualizer::draw_connections()
     sf::Text weightText;
     weightText.setFont(font);
     weightText.setCharacterSize(8);
-    weightText.setFillColor(sf::Color::White);
+    weightText.setFillColor(sf::Color::Black);
     weightText.setStyle(sf::Text::Bold);
 
     for (size_t i = 1; i < architecture->layers.size(); i++)
@@ -189,7 +189,7 @@ void NetworkVisualizer::draw_connections()
 
                     sf::Color color;
 
-                    color = sf::Color(100, 100, 100, 100);
+                    color = sf::Color::Black;
 
                     sf::Vertex line[] = {
                         sf::Vertex(previous_layer[k].position, color),
@@ -202,7 +202,7 @@ void NetworkVisualizer::draw_connections()
 
 
 
-                    float t = 0.3f;
+                    float t = 0.2f;
 
                     sf::Vector2f textPos;
                     textPos.x = posA.x + (posB.x - posA.x) * t;
